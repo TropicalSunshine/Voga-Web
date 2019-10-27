@@ -3,6 +3,8 @@ import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
 import SnackBar from "./SnackBar.js";
 import { thisExpression } from '@babel/types';
+
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 /*
 export default class WebCam extends Component {
     constructor(props)
@@ -56,7 +58,7 @@ export default class WebCam extends Component {
         addedWord: false,
         data: {
           js: null,
-          loaded: false
+          loaded: true
         }
       }
 
@@ -162,12 +164,12 @@ export default class WebCam extends Component {
         // draw top left rectangle
         ctx.fillRect(x, y, textWidth + 10, textHeight + 10);
         // draw bottom left rectangle
-        ctx.fillRect(x, y + height - textHeight, textWidth + 15, textHeight + 10);
+        //ctx.fillRect(x, y + height - textHeight, textWidth + 15, textHeight + 10);
   
         // Draw the text last to ensure it's on top.
         ctx.fillStyle = "#000000";
         ctx.fillText(prediction.class, x, y);
-        ctx.fillText(prediction.score.toFixed(2), x, y + height - textHeight);
+        //ctx.fillText(prediction.score.toFixed(2), x, y + height - textHeight);
       });
     };
 
@@ -204,6 +206,9 @@ export default class WebCam extends Component {
        
         Promise.all([loadlModelPromise, webcamPromise])
           .then(values => {
+            this.setState({
+              loaded: false
+            })
             this.detectFromVideoFrame(values[0], this.videoRef.current);
           })
           .catch(error => {
@@ -269,6 +274,7 @@ export default class WebCam extends Component {
         var translateWindow = (this.state.data.loaded) ? this.state.data.js : null;
       return (
         <div className = "webcam">
+          {this.state.loaded && (<Loader/>)}
           {translateWindow}
           {this.state.addedWord && <SnackBar word = {this.state.word}/>}
           <video
@@ -290,6 +296,10 @@ export default class WebCam extends Component {
 
 
   function TranslateWindow(props){
+
+    var def = props.definition.map((d, i) =>
+    <div key = {i}>{(i + 1) + ". " + d}</div>)
+
     return (
       <div className = "translate-window">
           <div style = {{opacity: 0.4, fontSize: "10pt"}}>Translated Word</div>
@@ -297,7 +307,15 @@ export default class WebCam extends Component {
           <div>{(props.pronunc != null) ? props.pronunc : ""}</div>
           <div style = {{opacity: 0.4, fontSize: "11pt", marginBottom: "-5px"}}>Definition</div>
           <h5> {props.word}</h5>
-          <div>{props.definition}</div>
+          <div>{def}</div>
+      </div>
+    )
+  }
+
+  function Loader(){
+    return (
+      <div className = "loader">
+        <Spinner size={SpinnerSize.large} />
       </div>
     )
   }

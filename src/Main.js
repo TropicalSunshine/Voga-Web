@@ -16,6 +16,9 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import { IStackTokens, Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 
+
+import logo from "./img/logo.png";
+
 export default class Main extends Component {
     constructor(props)
     {
@@ -70,7 +73,7 @@ export default class Main extends Component {
 
                         (
                             <div className = "main-buttons">
-                                <div className = "main-title">If its not you then its hella bs</div>
+                                <div className = "main-title"><img src = {logo} height = {450} width = {600}/></div>
                                 <div className = "main-content-button">
                                     <Button variant="contained" color = "primary" onClick = {() => {
         

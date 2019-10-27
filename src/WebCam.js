@@ -1,9 +1,8 @@
 import React, { Component, createRef } from 'react'
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
-import {sendWord, addWords} from "./network.js";
-
 import SnackBar from "./SnackBar.js";
+import { thisExpression } from '@babel/types';
 /*
 export default class WebCam extends Component {
     constructor(props)
@@ -54,7 +53,11 @@ export default class WebCam extends Component {
       this.state = {
         isloaded: false,
         word: "",
-        addedWord: false
+        addedWord: false,
+        data: {
+          js: null,
+          loaded: false
+        }
       }
 
       this.checkClick = this.checkClick.bind(this);
@@ -63,6 +66,7 @@ export default class WebCam extends Component {
 
       
           // reference to both the video and canvas
+    this.updateTranslateWindow = this.updateTranslateWindow.bind(this);
     this.videoRef = createRef();
     this.canvasRef = createRef();
 
@@ -105,12 +109,13 @@ export default class WebCam extends Component {
           this.setState({
             word: p[4],
             addedWord: true
+          }, () => {
+            this.updateTranslateWindow(this.state.word);
           })
-
-          sendWord(p[4],this.props.language);
         }
       });
 
+        
         //clearing the snackbar
         clearInterval(this.interval);
 
@@ -120,6 +125,7 @@ export default class WebCam extends Component {
           })
           clearInterval(that.setInterval);
         }, 3000)
+
       }
 
     
@@ -137,9 +143,9 @@ export default class WebCam extends Component {
         if(prediction.class === "person"){
           return;
         }
-        
-        const y = prediction.bbox[0] + (175 * prediction.bbox[0]/600);
-        const x = prediction.bbox[1] + (175 * prediction.bbox[0]/600);
+
+        const x = prediction.bbox[0] + (175 * prediction.bbox[0]/600);
+        const y = prediction.bbox[1] + (175 * prediction.bbox[0]/600);
         const width = prediction.bbox[2];
         const height = prediction.bbox[3];
 
@@ -195,7 +201,7 @@ export default class WebCam extends Component {
         const loadlModelPromise = cocoSsd.load();
         
         // resolve all the Promises
-       /*
+       
         Promise.all([loadlModelPromise, webcamPromise])
           .then(values => {
             this.detectFromVideoFrame(values[0], this.videoRef.current);
@@ -203,7 +209,6 @@ export default class WebCam extends Component {
           .catch(error => {
             console.error(error);
           });
-*/
 
 
       }
@@ -213,6 +218,46 @@ export default class WebCam extends Component {
       clearInterval(this.interval);
     }
 
+    updateTranslateWindow(word){
+      var url = "https://" + window.location.host;
+      async function getTranslation(word, language, callback){
+        console.log("url",url);
+        console.log("word", word);
+        console.log("lang", language);
+        
+        await fetch(url + "/translate", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            }, 
+            body:JSON.stringify({
+                "word": word,
+                "language": language
+            }) 
+        }).then(res => res.json()).then(function(resp){
+            console.log(resp["result"]);
+            callback(resp["result"]);
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+      (async () => {
+        await getTranslation(word, this.props.language, (r) => {
+          this.setState({
+            data: {
+              js: (<TranslateWindow definition = {r["definition"]} 
+              word = {this.state.word} pronunc = {r["translated_pron"]}
+              transWord = {r["translated_word"]} />),
+              loaded: true
+            }
+          })
+        })
+      })()
+
+    }
+
   
     // here we are returning the video frame and canvas to draw,
     // so we are in someway drawing our video "on the go"
@@ -220,11 +265,14 @@ export default class WebCam extends Component {
         var that = this;
         var vidwidth = window.screen.width;
         var vidheight = window.screen.height;
+
+        var translateWindow = (this.state.data.loaded) ? this.state.data.js : null;
       return (
         <div className = "webcam">
-          <TranslateWindow/>
+          {translateWindow}
           {this.state.addedWord && <SnackBar word = {this.state.word}/>}
           <video
+            style = {{cursor:"pointer"}}
             facingMode="environment"
             style={this.styles}
             autoPlay
@@ -244,9 +292,12 @@ export default class WebCam extends Component {
   function TranslateWindow(props){
     return (
       <div className = "translate-window">
-          <div style = {{opacity: 0.4, fontSize: "10pt"}}>Description</div>
-          <div> props.word</div>
-          <div>props.definition</div>
+          <div style = {{opacity: 0.4, fontSize: "10pt"}}>Translated Word</div>
+          <div style = {{fontSize: "13pt", fontWeight: 800}}>{props.transWord}</div>
+          <div>{(props.pronunc != null) ? props.pronunc : ""}</div>
+          <div style = {{opacity: 0.4, fontSize: "11pt", marginBottom: "-5px"}}>Definition</div>
+          <h5> {props.word}</h5>
+          <div>{props.definition}</div>
       </div>
     )
   }

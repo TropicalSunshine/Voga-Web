@@ -286,11 +286,16 @@ body{
 
 
 .translate-window{
+  overflow: auto;
+
+  padding: 10px;
   position: absolute;
-  left: 10%;
+  z-index: 1000;
+  left: 5%;
   top: 20%;
-  height: auto;
+  height: 350px;
   width: 200px;
-  box-shadow:0 0 .1rem #fff,inset 0 0 .1rem #fff,0 0 2rem #f40,inset 0 0 .1rem #f40,0 0 .2rem #f40,inset 0 0 .1rem #f40;
+  box-shadow: 0 10px 6px -6px #777;
   background-color: white;
+  min-height: 190px;
 }

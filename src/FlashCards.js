@@ -17,12 +17,8 @@ export default class FlashCards extends Component {
     }
 
     componentDidMount(){
-
-    }
-    
-    
-    
-    
+        
+    }   
     
     render() {
 

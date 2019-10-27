@@ -24,7 +24,7 @@ export default class Main extends Component {
             isFlashCards: false,
             default: true,
             isScan: false,
-            langauge: "es"
+            language: "fr"
         }
 
         this.background = this.background.bind(this);

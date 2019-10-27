@@ -1,7 +1,7 @@
 import React, { Component, createRef } from 'react'
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
-import {sendWord} from "./network.js";
+import {sendWord, addWords} from "./network.js";
 
 import SnackBar from "./SnackBar.js";
 /*
@@ -108,6 +108,7 @@ export default class WebCam extends Component {
           })
 
           sendWord(p[4],this.props.language);
+          addWord(word);
         }
       });
 

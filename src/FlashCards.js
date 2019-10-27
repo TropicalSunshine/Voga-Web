@@ -17,7 +17,7 @@ export default class FlashCards extends Component {
     }
 
     componentDidMount(){
-        
+
     }
     
     
@@ -80,7 +80,7 @@ export default class FlashCards extends Component {
                     <Grid item xs={6}>
                         <div className = "word-definition">
                             <div className = "word-def-title">Definition</div>
-                            <div className = "word-def-text">The cat is a small carnivorous mammal. It is the only domesticated species in the family Felidae and often referred to as the domestic cat to distinguish it from wild members of the family. The cat is either a house cat or a farm cat, which are pets, or a feral cat, which ranges freely and avoids human contact.</div>
+                            <div className = "word-def-text">{}</div>
                         </div>
                     </Grid>
                     

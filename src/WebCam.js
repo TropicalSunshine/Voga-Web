@@ -1,6 +1,9 @@
 import React, { Component, createRef } from 'react'
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
+import {sendWord} from "./network.js";
+
+import SnackBar from "./SnackBar.js";
 /*
 export default class WebCam extends Component {
     constructor(props)
@@ -43,16 +46,36 @@ export default class WebCam extends Component {
 */
 
 export default class WebCam extends Component {
-    // reference to both the video and canvas
-    videoRef = createRef();
-    canvasRef = createRef();
-  
+
+    constructor(props){
+      super(props);
+
+      this.predictions = [];
+      this.state = {
+        isloaded: false,
+        word: "",
+        addedWord: false
+      }
+
+      this.checkClick = this.checkClick.bind(this);
+
+      this.interval = null;
+
+      
+          // reference to both the video and canvas
+    this.videoRef = createRef();
+    this.canvasRef = createRef();
+
+    
     // we are gonna use inline style
-    styles = {
+    this.styles = {
       position: 'fixed',
-      top: 150,
-      left: 150,
+      marginLeft: "auto",
+      marginRight: "auto",
+      left: 0,
+      right: 0
     };
+     }
   
   
     detectFromVideoFrame = (model, video) => {
@@ -67,6 +90,39 @@ export default class WebCam extends Component {
         console.error(error)
       });
     };
+
+    checkClick = (e) => {
+      var that = this;
+
+
+      var x = (e.pageX - this.canvasRef.current.offsetLeft);
+      var y = (e.pageY - this.canvasRef.current.offsetTop);
+
+      this.predictions.forEach((p) => {
+        console.log("aaa");
+        if( (x > p[0])&&(x < (p[0] + p[2]) )&&(y > p[1])&&(y < (p[1] + p[3]) ) ){
+          //do something with p[4]
+          this.setState({
+            word: p[4],
+            addedWord: true
+          })
+
+          sendWord(p[4],this.props.language);
+        }
+      });
+
+        //clearing the snackbar
+        clearInterval(this.interval);
+
+        this.interval =  setInterval(()=> {
+          this.setState({
+            addedWord: false
+          })
+          clearInterval(that.setInterval);
+        }, 3000)
+      }
+
+    
   
     showDetections = predictions => {
       const ctx = this.canvasRef.current.getContext("2d");
@@ -74,12 +130,18 @@ export default class WebCam extends Component {
       const font = "24px helvetica";
       ctx.font = font;
       ctx.textBaseline = "top";
-  
+      
+      this.predictions = [];
       predictions.forEach(prediction => {
-        const x = prediction.bbox[0];
-        const y = prediction.bbox[1];
+      
+        
+        const y = prediction.bbox[0];
+        const x = prediction.bbox[1];
         const width = prediction.bbox[2];
         const height = prediction.bbox[3];
+
+        this.predictions.push([x, y, width, height, prediction.class]);
+
         // Draw the bounding box.
         ctx.strokeStyle = "#2fff00";
         ctx.lineWidth = 1;
@@ -99,7 +161,9 @@ export default class WebCam extends Component {
         ctx.fillText(prediction.score.toFixed(2), x, y + height - textHeight);
       });
     };
+
   
+    
     componentDidMount() {
       if (navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia) {
         // define a Promise that'll be used to load the webcam and read its frames
@@ -113,7 +177,7 @@ export default class WebCam extends Component {
             window.stream = stream;
             // pass the stream to the videoRef
             this.videoRef.current.srcObject = stream;
-  
+            
             return new Promise(resolve => {
               this.videoRef.current.onloadedmetadata = () => {
                 resolve();
@@ -123,11 +187,12 @@ export default class WebCam extends Component {
             console.log("Couldn't start the webcam")
             console.error(error)
           });
-  
+
         // define a Promise that'll be used to load the model
         const loadlModelPromise = cocoSsd.load();
         
         // resolve all the Promises
+       
         Promise.all([loadlModelPromise, webcamPromise])
           .then(values => {
             this.detectFromVideoFrame(values[0], this.videoRef.current);
@@ -135,29 +200,55 @@ export default class WebCam extends Component {
           .catch(error => {
             console.error(error);
           });
+
+
+
       }
     }
+
+    componentWillUnmount(){
+      clearInterval(this.interval);
+    }
+
   
     // here we are returning the video frame and canvas to draw,
     // so we are in someway drawing our video "on the go"
     render() {
-
+        var that = this;
         var vidwidth = window.screen.width;
         var vidheight = window.screen.height;
       return (
-        <div> 
+        <div className = "webcam">
+          {this.state.addedWord && <SnackBar word = {this.state.word}/>}
           <video
             facingMode="environment"
             style={this.styles}
             autoPlay
             muted
             ref={this.videoRef}
-            width="720"
-            height="650"
-  
+            width="800px"
+            height="600px"
           />
-          <canvas style={this.styles} ref={this.canvasRef} width="720" height="650" />
+          <canvas style={this.styles} ref={this.canvasRef} width="800px" height="600px" 
+          onClick = {this.checkClick}/>
         </div>
       );
+    }
+  }
+
+
+
+  class WordList extends Component{
+    constructor(prop){
+
+    }
+
+    shouldComponentUpdate
+    render(){
+      return (
+        <div className = "Wordlist">
+          
+        </div>
+      )
     }
   }

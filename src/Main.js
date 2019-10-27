@@ -13,6 +13,9 @@ import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 
 
+import { IStackTokens, Stack } from 'office-ui-fabric-react/lib/Stack';
+import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+
 export default class Main extends Component {
     constructor(props)
     {
@@ -20,13 +23,16 @@ export default class Main extends Component {
         this.state = {
             isFlashCards: false,
             default: true,
-            isScan: false
+            isScan: false,
+            langauge: "es"
         }
 
         this.background = this.background.bind(this);
         this.background(this.state);
 
         this.updateState = this.updateState.bind(this);
+
+        this.dropdownAction = this.dropdownAction.bind(this);
     }
 
     updateState(state){
@@ -41,6 +47,16 @@ export default class Main extends Component {
         body.style.animation = "gradientFlow 5s infinite linear";
     }
 
+    dropdownAction(e, key){
+        console.log(key.key);
+        this.setState(
+            {
+                language: key.key
+            }
+        )
+
+    }
+
     render() {
 
         return (
@@ -48,7 +64,7 @@ export default class Main extends Component {
                 <div className = "Main-container">
                     <div className = "Main-content">
                         {this.state.isFlashCards && (<FlashCards/>)}
-                        {this.state.isScan && (<WebCam/>)}
+                        {this.state.isScan && (<WebCam language = {this.state.language}/>)}
                         {
                             this.state.default && 
 
@@ -78,6 +94,9 @@ export default class Main extends Component {
                                     }}>
                                         Practice
                                     </Button>
+                                </div>
+                                <div className = "main-drop-down">
+                                    <DropDown action = {this.dropdownAction}/>
                                 </div>
                             </div>
                         )}
@@ -129,3 +148,46 @@ function SimpleBottomNavigation(props) {
       </BottomNavigation>
     );
   }
+
+  const dropdownStyles = {
+    dropdown: { width: 300 }
+  };
+  const stackTokens = { childrenGap: 20 };
+const options = [
+    {
+        key: "es",
+        text: "Spanish"
+    },
+    {
+        key: "fr",
+        text: "French"
+    },
+    {
+        key: "zh-cn",
+        text: "Chinese"
+    },
+    {
+        key: "ja",
+        text: "Japanese"
+    },
+    {
+        key: "ko",
+        text: "Korean"
+    }
+  ];
+
+function DropDown(props){
+    return (
+        <Stack tokens={stackTokens}>
+          <Dropdown
+            onChange = {props.action}
+            placeHolder = "Select"
+            label="Select a Language"
+            defaultSelectedKey="Spanish"
+            options={options}
+            disabled={false}
+            styles={dropdownStyles}
+          />
+        </Stack>
+      );
+}

@@ -12,14 +12,12 @@ export default class FlashCards extends Component {
         this.state = {
             flashcard: true,
             currentWordIndex: 0, 
-            words: [
-                {
-                    word: "Apple",
-                    pos: "noun",
-                    def: "the round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh. Many varieties have been developed as dessert or cooking fruit or for making cider."
-                }
-            ]
+            words: []
         }
+    }
+
+    componentDidMount(){
+        
     }
     
     

@@ -283,3 +283,14 @@ body{
   display: inline-block;
   border-radius: 50%;
 }
+
+
+.translate-window{
+  position: absolute;
+  left: 10%;
+  top: 20%;
+  height: auto;
+  width: 200px;
+  box-shadow:0 0 .1rem #fff,inset 0 0 .1rem #fff,0 0 2rem #f40,inset 0 0 .1rem #f40,0 0 .2rem #f40,inset 0 0 .1rem #f40;
+  background-color: white;
+}

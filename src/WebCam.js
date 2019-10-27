@@ -108,7 +108,6 @@ export default class WebCam extends Component {
           })
 
           sendWord(p[4],this.props.language);
-          addWord(word);
         }
       });
 
@@ -135,9 +134,12 @@ export default class WebCam extends Component {
       this.predictions = [];
       predictions.forEach(prediction => {
       
+        if(prediction.class === "person"){
+          return;
+        }
         
-        const y = prediction.bbox[0];
-        const x = prediction.bbox[1];
+        const y = prediction.bbox[0] + (175 * prediction.bbox[0]/600);
+        const x = prediction.bbox[1] + (175 * prediction.bbox[0]/600);
         const width = prediction.bbox[2];
         const height = prediction.bbox[3];
 
@@ -193,7 +195,7 @@ export default class WebCam extends Component {
         const loadlModelPromise = cocoSsd.load();
         
         // resolve all the Promises
-       
+       /*
         Promise.all([loadlModelPromise, webcamPromise])
           .then(values => {
             this.detectFromVideoFrame(values[0], this.videoRef.current);
@@ -201,7 +203,7 @@ export default class WebCam extends Component {
           .catch(error => {
             console.error(error);
           });
-
+*/
 
 
       }
@@ -220,6 +222,7 @@ export default class WebCam extends Component {
         var vidheight = window.screen.height;
       return (
         <div className = "webcam">
+          <TranslateWindow/>
           {this.state.addedWord && <SnackBar word = {this.state.word}/>}
           <video
             facingMode="environment"
@@ -238,18 +241,12 @@ export default class WebCam extends Component {
   }
 
 
-
-  class WordList extends Component{
-    constructor(prop){
-
-    }
-
-    shouldComponentUpdate
-    render(){
-      return (
-        <div className = "Wordlist">
-          
-        </div>
-      )
-    }
+  function TranslateWindow(props){
+    return (
+      <div className = "translate-window">
+          <div style = {{opacity: 0.4, fontSize: "10pt"}}>Description</div>
+          <div> props.word</div>
+          <div>props.definition</div>
+      </div>
+    )
   }

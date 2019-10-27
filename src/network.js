@@ -32,7 +32,7 @@ module.exports = {
     },
 
 
-    getTranslation: function(){
+    getTranslation: function(word, language){
         fetch(url + "/translations", {
             method: "POST",
             headers: {

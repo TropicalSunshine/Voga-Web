@@ -7,4 +7,4 @@ Install Project
 2. run `npm install`
 3. then `npm start`
 
-![](//challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/874/301/datas/gallery.jpg)
+![screenshot 1](//challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/874/301/datas/gallery.jpg)
